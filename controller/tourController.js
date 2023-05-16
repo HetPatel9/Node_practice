@@ -18,19 +18,39 @@ const Tour = require('./../models/tourModel');
 
 exports.getAllTour = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((el) => {
+      delete queryObj[el];
+    });
+
+    console.log(req.query, queryObj);
+
+    const tours = await Tour.find(queryObj);
+
+    // const tours = await Tour.find({
+    //   difficulty: 'easy',
+    //   price: 3333
+    // });
+
+    // const tours = await Tour.find()
+    //   .where('difficulty')
+    //   .equals('easy')
+    //   .where('price')
+    //   .equals(3333);
+
     res.status(200).json({
       status: 'success',
       requestAt: req.requestTime,
       results: tours.length,
       data: {
-        tours,
-      },
+        tours
+      }
     });
   } catch (err) {
     res.status(404).json({
       status: 'Fail',
-      message: err,
+      message: err
     });
   }
 };
@@ -43,13 +63,13 @@ exports.getTour = async (req, res) => {
     res.status(201).json({
       status: 'success',
       data: {
-        tour,
-      },
+        tour
+      }
     });
   } catch (err) {
     res.status(404).json({
       status: 'fail',
-      message: 'Tour not found',
+      message: 'Tour not found'
     });
   }
 };
@@ -64,62 +84,94 @@ exports.createTour = async (req, res) => {
     res.status(201).json({
       status: 'success',
       data: {
-        tour: newTour,
-      },
+        tour: newTour
+      }
     });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
-      message: 'Invalid Data set',
+      message: err
     });
   }
 };
 
-exports.updateTour = (req, res) => {
-  const id = req.params.id * 1;
+exports.updateTour = async (req, res) => {
+  // BY USING MONGOOSE
+  try {
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
 
-  const tour = tours.find((el) => el.id === id);
-  for (field in req.body.data) {
-    tour[field] = req.body.data[field];
-    console.log(field);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour
+      }
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Invalid Data set'
+    });
   }
 
-  fs.writeFile(
-    `${__dirname}/../dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.json({
-        status: 'success',
-        data: {
-          tour,
-        },
-      });
-    }
-  );
+  // BY USING FS MODULE
+  // const id = req.params.id * 1;
+  // const tour = tours.find((el) => el.id === id);
+  // for (field in req.body.data) {
+  //   tour[field] = req.body.data[field];
+  //   console.log(field);
+  // }
+  // fs.writeFile(
+  //   `${__dirname}/../dev-data/data/tours-simple.json`,
+  //   JSON.stringify(tours),
+  //   (err) => {
+  //     res.json({
+  //       status: 'success',
+  //       data: {
+  //         tour,
+  //       },
+  //     });
+  //   }
+  // );
 };
 
-exports.deleteTour = (req, res) => {
-  const id = req.params.id * 1;
+exports.deleteTour = async (req, res) => {
+  // USING mongoose
+  try {
+    await Tour.findByIdAndDelete(req.params.id);
 
-  let i;
-  function findindex() {
-    for (i = 0; i < tours.length; i++) {
-      if (tours[i].id === id) {
-        return i;
-      } else {
-        i++;
-      }
-    }
+    res.status(204).json({
+      status: 'Success',
+      data: null
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'Fail',
+      message: err
+    });
   }
 
-  const index = findindex();
-  tours.splice(index, 1);
-
-  fs.writeFile(
-    `${__dirname}/../dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(204);
-    }
-  );
+  //  USING FS MODULE
+  // const id = req.params.id * 1;
+  // let i;
+  // function findindex() {
+  //   for (i = 0; i < tours.length; i++) {
+  //     if (tours[i].id === id) {
+  //       return i;
+  //     } else {
+  //       i++;
+  //     }
+  //   }
+  // }
+  // const index = findindex();
+  // tours.splice(index, 1);
+  // fs.writeFile(
+  //   `${__dirname}/../dev-data/data/tours-simple.json`,
+  //   JSON.stringify(tours),
+  //   (err) => {
+  //     res.status(204);
+  //   }
+  // );
 };
