@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "debug": "ndb server.js"
   },
   "keywords": [],
   "author": "het",
@@ -15,5 +16,8 @@
     "mongoose": "^5.13.17",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.22"
+  },
+  "devDependencies": {
+    "ndb": "^1.1.5"
   }
 }
