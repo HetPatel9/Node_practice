@@ -36,6 +36,23 @@ const app = require('./app');
 // console.log(process.env);
 
 const PORT = 3000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`App is running on port ${PORT}`);
 });
+
+process.on('unhandledRejection', (err) => {
+  console.log('unhanled rejection: Shuting Down.......');
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
+});
+process.on('uncaughtException', (err) => {
+  console.log('UNCAUGHT EXCEPTION: Shuting Down.......');
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
+});
+
+// console.log(x);
