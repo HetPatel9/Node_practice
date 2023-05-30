@@ -9,6 +9,7 @@ const hpp = require('hpp');
 const appError = require('./utils/appError');
 const tourRouter = require('./routes/tourRouter');
 const userRouter = require('./routes/userRouter');
+const reviewRouter = require('./routes/reviewRouter');
 const globalErrorHandler = require('./controller/errorController');
 
 const app = express();
@@ -76,6 +77,7 @@ app.use((req, res, next) => {
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 app.all('*', (req, res, next) => {
   // const err = new Error(`Page ${req.originalUrl} not Found`);
