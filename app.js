@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -11,9 +12,15 @@ const tourRouter = require('./routes/tourRouter');
 const userRouter = require('./routes/userRouter');
 const reviewRouter = require('./routes/reviewRouter');
 const globalErrorHandler = require('./controller/errorController');
+const viewsRouter = require('./routes/viewsRouter');
 
 const app = express();
 
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+// Serving static file
+app.use(express.static(path.join(__dirname, 'public')));
 // Set security http header
 app.use(helmet());
 
@@ -53,9 +60,6 @@ app.use(
   })
 );
 
-// Serving static file
-app.use(express.static(`${__dirname}/public`));
-
 app.use((req, res, next) => {
   // console.log('hii from 1st middleware');
   next();
@@ -75,6 +79,7 @@ app.use((req, res, next) => {
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
 
+app.use('/', viewsRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/reviews', reviewRouter);
